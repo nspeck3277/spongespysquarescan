@@ -1,0 +1,11 @@
+[Unit]
+Description=Run recon every five minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=5min
+AccuracySec=1s
+Unit=spongespysquarescan.service
+
+[Install]
+WantedBy=timers.target

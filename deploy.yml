@@ -1,5 +1,5 @@
 ---
-- name: Install Ubuntu reconnaissance client
+- name: Install sponespysquarescan
   hosts: ubuntu_clients
   become: true
   vars:
@@ -23,7 +23,7 @@
 
     - name: Create scanner directory
       ansible.builtin.file:
-        path: /media/fun/ubuntu-recon
+        path: /media/fun/spongespysquarescan
         state: directory
         owner: root
         group: root
@@ -32,44 +32,44 @@
     - name: Install scanner script
       ansible.builtin.copy:
         src: files/scan_client.py
-        dest: /media/fun/ubuntu-recon/scan_client.py
+        dest: /media/fun/spongespysquarescan/scan_client.py
         owner: root
         group: root
         mode: '0755'
 
     - name: Install scanner service
       ansible.builtin.copy:
-        dest: /etc/systemd/system/ubuntu-recon.service
+        dest: /etc/systemd/system/spongespysquarescan.service
         owner: root
         group: root
         mode: '0644'
         content: |
           [Unit]
-          Description=Send Ubuntu reconnaissance results to lab receiver
+          Description=Send recon results to lab receiver
           Wants=network-online.target
           After=network-online.target
 
           [Service]
           Type=oneshot
-          ExecStart=/usr/bin/python3 /media/fun/ubuntu-recon/scan_client.py --server http://{{ recon_server }}:{{ recon_port }}/ --target {{ recon_target }}
+          ExecStart=/usr/bin/python3 /media/fun/spongespysquarescan/scan_client.py --server http://{{ recon_server }}:{{ recon_port }}/ --target {{ recon_target }}
           TimeoutStartSec=180
       register: recon_service
 
     - name: Install five-minute timer
       ansible.builtin.copy:
-        dest: /etc/systemd/system/ubuntu-recon.timer
+        dest: /etc/systemd/system/spongespysquarescan.timer
         owner: root
         group: root
         mode: '0644'
         content: |
           [Unit]
-          Description=Run Ubuntu reconnaissance every five minutes
+          Description=Run recon every five minutes
 
           [Timer]
           OnBootSec=1min
           OnUnitInactiveSec=5min
           AccuracySec=1s
-          Unit=ubuntu-recon.service
+          Unit=spongespysquarescan.service
 
           [Install]
           WantedBy=timers.target
@@ -77,13 +77,13 @@
 
     - name: Enable and start timer
       ansible.builtin.systemd_service:
-        name: ubuntu-recon.timer
+        name: spongespysquarescan.timer
         daemon_reload: true
         enabled: true
         state: "{{ 'restarted' if recon_timer.changed else 'started' }}"
 
     - name: Run an initial scan
       ansible.builtin.systemd_service:
-        name: ubuntu-recon.service
+        name: spongespysquarescan.service
         state: started
       when: recon_service.changed or recon_timer.changed

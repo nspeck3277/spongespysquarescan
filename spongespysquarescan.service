@@ -1,0 +1,9 @@
+[Unit]
+Description=Send recon results to lab receiver
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /media/fun/spongespysquarescan/scan_client.py --server http://{{ recon_server }}:{{ recon_port }}/ --target {{ recon_target }}
+TimeoutStartSec=180
