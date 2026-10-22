@@ -1,0 +1,11 @@
+[Unit]
+Description=Run Ubuntu reconnaissance scan every five minutes
+
+[Timer]
+OnBootSec=1min
+OnUnitInactiveSec=5min
+AccuracySec=1s
+Unit=ubuntu-recon.service
+
+[Install]
+WantedBy=timers.target

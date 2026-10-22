@@ -1,0 +1,9 @@
+[Unit]
+Description=Run Ubuntu reconnaissance scan and send results to lab receiver
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 /opt/ubuntu-recon/scan_client.py --server http://192.168.1.168:9000/
+TimeoutStartSec=180
